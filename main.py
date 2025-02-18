@@ -4,9 +4,9 @@ import argparse
 from create_data import create_data_loaders
 from models.CNN import PromoterCNN, FocalLoss
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics import roc_curve, auc
 import time
+from tools import find_optimal_threshold
+from sklearn.metrics import confusion_matrix, accuracy_score, matthews_corrcoef
 
 def train(model, train_loader, device, num_epochs=20, patience=3):
     criterion = FocalLoss()
@@ -57,26 +57,35 @@ def train(model, train_loader, device, num_epochs=20, patience=3):
     checkpoint = torch.load('best_model.pth')
     model.load_state_dict(checkpoint['model_state_dict'])
 
-def evaluate(model, test_loader, y_test, device):
+def evaluate(model, test_loader, y_test, device, threshold=0.5):
     model.eval()
     y_pred_probs = []
-    
+
     with torch.no_grad():
         for X_batch, _ in test_loader:
             X_batch = X_batch.to(device)
             y_pred_probs.extend(model(X_batch).cpu().numpy())
-    
+
     y_pred_probs = np.array(y_pred_probs).ravel()
     
-    fpr, tpr, _ = roc_curve(y_test.numpy(), y_pred_probs)
-    roc_auc = auc(fpr, tpr)
-    
-    plt.figure()
-    plt.plot(fpr, tpr, label=f'ROC curve (AUC = {roc_auc:.2f})')
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.legend()
-    plt.show()
+    optimal_threshold = find_optimal_threshold(y_test.numpy(), y_pred_probs)
+
+    y_pred = (y_pred_probs >= optimal_threshold).astype(int)
+
+    # Compute confusion matrix
+    tn, fp, fn, tp = confusion_matrix(y_test.numpy(), y_pred).ravel()
+
+    # Compute classification metrics
+    sensitivity = tp / (tp + fn) if (tp + fn) > 0 else 0  
+    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0  
+    accuracy = accuracy_score(y_test.numpy(), y_pred)  
+    mcc = matthews_corrcoef(y_test.numpy(), y_pred) 
+
+    # Print and return metrics
+    print(f"Sensitivity (Sn): {sensitivity:.4f}")
+    print(f"Specificity (Sp): {specificity:.4f}")
+    print(f"Accuracy (Acc): {accuracy:.4f}")
+    print(f"Matthews Correlation Coefficient (MCC): {mcc:.4f}")
 
 def main():
     parser = argparse.ArgumentParser()

@@ -19,6 +19,7 @@ This model is designed specifically for **sequence-based classification** using 
 ## **Dataset**
 
 The dataset used in this project is from [CNNPromoterData](https://github.com/solovictor/CNNPromoterData/tree/master), which was originally used in the [paper](https://arxiv.org/abs/1610.00121).
+
 ---
 
 ## **Installation & Dependencies**
@@ -42,8 +43,8 @@ pip install -r requirements.txt
 To train the model, use:
 ```bash
 python main.py --train \
-    --prom_path dataset/human_non_tata.fa \
-    --non_prom_path dataset/human_nonprom_big.fa \
+    --prom_path promoter_dataset_path \
+    --non_prom_path nonpromoter_dataset_path \
 ```
 
 The trained model will be saved as **`saved_model.pth`** by default.
@@ -55,8 +56,8 @@ To evaluate a trained model, run:
 ```bash
 python main.py --eval \
     --model_path saved_model.pth \
-    --test_prom dataset/human_non_tata.fa \
-    --test_non_prom dataset/human_nonprom_big.fa
+    --test_prom promoter_dataset_path \
+    --test_non_prom nonpromoter_dataset_path
 ```
 
 ## **Example Workflow**

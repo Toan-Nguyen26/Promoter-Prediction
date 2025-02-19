@@ -66,3 +66,35 @@ def create_train_test_data(prom_path="dataset/Ecoli_prom.fa", non_prom_path="dat
     )
 
     return X_train, X_test, y_train, y_test, seq_length
+
+# Function to load and split sequences
+def create_train_test_data_transformer():
+    PROMO_DIR = "promo_dataset/"
+    NON_PROMO_DIR = "non_promo_dataset/"
+
+    def load_sequences_from_folder(folder):
+        sequences = []
+        for file in os.listdir(folder):
+            if file.endswith(".fa") or file.endswith(".fasta"):
+                filepath = os.path.join(folder, file)
+                for record in SeqIO.parse(filepath, "fasta"):
+                    sequences.append(str(record.seq).upper())  # Convert to uppercase
+        return sequences
+
+    promo_sequences = load_sequences_from_folder(PROMO_DIR)
+    non_promo_sequences = load_sequences_from_folder(NON_PROMO_DIR)
+
+    promo_labels = [1] * len(promo_sequences)
+    non_promo_labels = [0] * len(non_promo_sequences)
+
+    all_sequences = promo_sequences + non_promo_sequences
+    all_labels = promo_labels + non_promo_labels
+
+    print(f"Total sequences: {len(all_sequences)} (Promoters: {len(promo_sequences)}, Non-promoters: {len(non_promo_sequences)})")
+    
+    # Split dataset into train and test
+    train_sequences, test_sequences, train_labels, test_labels = train_test_split(
+        all_sequences, all_labels, test_size=0.2, stratify=all_labels, random_state=42
+    )
+    
+    return train_sequences, test_sequences, train_labels, test_labels

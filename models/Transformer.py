@@ -1,13 +1,16 @@
 import torch
 import torch.nn as nn
-from dotenv import load_dotenv
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel, AutoConfig
 
 # tokenizer = BertTokenizer.from_pretrained("jzhihan1996/DNABERT-2-117M", do_lower_case=False)
 # dna_bert = BertModel.from_pretrained("zhihan1996/DNABERT-2-117M")
 
 tokenizer = AutoTokenizer.from_pretrained("zhihan1996/DNABERT-2-117M", trust_remote_code=True)
-dna_bert = AutoModel.from_pretrained("zhihan1996/DNABERT-2-117M", trust_remote_code=True)
+# Then load the model with the custom 
+# Load the custom config first
+config = AutoConfig.from_pretrained("zhihan1996/DNABERT-2-117M", trust_remote_code=True)
+
+dna_bert = AutoModel.from_pretrained("zhihan1996/DNABERT-2-117M", config=config, trust_remote_code=True)
 
 # Move model to GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -26,7 +29,7 @@ def get_dna_bert_embedding(sequence):
 class DNABERT_TransformerClassifier(nn.Module):
     def __init__(self):
         super().__init__()
-        self.dna_bert = AutoModel.from_pretrained("zhihan1996/DNABERT-2-117M")
+        self.dna_bert = AutoModel.from_pretrained("zhihan1996/DNABERT-2-117M", trust_remote_code=True)
         self.classifier = nn.Linear(768, 1)  # DNABERT-2 has 768 hidden dimensions
         self.dropout = nn.Dropout(0.1)
 

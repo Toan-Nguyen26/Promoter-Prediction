@@ -1,9 +1,5 @@
 import torch
 import torch.nn as nn
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
 
 class PromoterCNN(nn.Module):
     def __init__(self, seqLength):

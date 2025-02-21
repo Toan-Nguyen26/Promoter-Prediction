@@ -3,11 +3,8 @@ import numpy as np
 from Bio import SeqIO
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
-
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
 
 # One-hot encoding function
 def one_hot_encode(seq, seq_length):

@@ -1,6 +1,6 @@
 # **Promoter Sequence Classifier**
 
-A deep learning framework for classifying bacterial promoter sequences using Convolutional Neural Networks (CNN). This project implements a **binary classifier** to distinguish between **promoter** and **non-promoter** DNA sequences, such as those in *E. coli*.
+A deep learning framework for classifying bacterial promoter sequences using different types of deep learning techniques. This project implements a **binary classifier** to distinguish between **promoter** and **non-promoter** DNA sequences, such as those in *E. coli*.
 
 ---
 

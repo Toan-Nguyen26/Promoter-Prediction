@@ -24,23 +24,27 @@ def get_dna_bert_embedding(sequence):
 
 
 class DNABERT_TransformerClassifier(nn.Module):
-    def __init__(self, num_encoder_layers=2, embed_dim=768, num_heads=8, ff_hidden=512):
-        super(DNABERT_TransformerClassifier, self).__init__()
-        
-        # Load DNA-BERT
+    def __init__(self):
+        super().__init__()
         self.dna_bert = AutoModel.from_pretrained("zhihan1996/DNABERT-2-117M")
-        
-        # Transformer Encoder Layers
-        encoder_layer = nn.TransformerEncoderLayer(embed_dim, num_heads, ff_hidden, dropout=0.1)
-        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_encoder_layers)
-
-        self.fc = nn.Linear(embed_dim, 1) 
+        self.classifier = nn.Linear(768, 1)  # DNABERT-2 has 768 hidden dimensions
+        self.dropout = nn.Dropout(0.1)
 
     def forward(self, x):
-        with torch.no_grad():
-            x = self.dna_bert(**x).last_hidden_state  
+        # Unpack the input dictionary
+        input_ids = x["input_ids"]
+        attention_mask = x["attention_mask"]
         
-        x = self.transformer_encoder(x)  #
-        x = x.mean(dim=1) 
-        return torch.sigmoid(self.fc(x))  
+        # Get BERT outputs
+        outputs = self.dna_bert(input_ids=input_ids, attention_mask=attention_mask)
+        
+        # Use the [CLS] token representation (first token)
+        cls_output = outputs[0][:, 0, :]  # Shape: (batch_size, hidden_size)
+        
+        # Apply dropout and classification layer
+        x = self.dropout(cls_output)
+        x = self.classifier(x)
+        
+        # Apply sigmoid for binary classification
+        return torch.sigmoid(x)
 

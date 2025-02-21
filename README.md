@@ -1,18 +1,20 @@
 # **Promoter Sequence Classifier**
 
-A deep learning model for classifying bacterial promoter sequences using Convolutional Neural Networks (CNN). This project implements a **binary classifier** to distinguish between **promoter** and **non-promoter** DNA sequences, such as those in *E. coli*.
+A deep learning framework for classifying bacterial promoter sequences using Convolutional Neural Networks (CNN). This project implements a **binary classifier** to distinguish between **promoter** and **non-promoter** DNA sequences, such as those in *E. coli*.
 
 ---
 
 ## **Overview**
 
-This model is designed specifically for **sequence-based classification** using CNNs with the following features:
+This framework offers two approaches for **sequence-based classification**:
 
+### **CNN Model**
 - **One-hot encoding** for DNA sequence representation.
 - **Convolutional layers** to extract important sequence motifs.
-- **Batch normalization & dropout** for improved generalization.
-- **Focal Loss** to handle class imbalance effectively.
-- **Efficient training and evaluation scripts** for easy use.
+
+### **Transformer Model (DNA-BERT)**
+- Uses pre-trained **DNA-BERT** for sequence embeddings
+- Uses **Transformer Decoder** to learn DNA sequences patterns
 
 ---
 
@@ -36,48 +38,72 @@ pip install -r requirements.txt
 ```
 
 ---
+## **Command Line Arguments**
+
+### **General Arguments**
+```
+--model          Choose model type: 'CNN' or 'transformer' (default: 'CNN')
+--train          Flag to train the model
+--eval           Flag to evaluate the model
+--num_epochs     Number of training epochs (default: 10)
+--subset_size    Number of samples to use for quick testing (optional only for Transformer model)
+```
+
+### **Data Arguments**
+```
+--prom_path      Path to promoter sequence dataset (default: 'promo_dataset/Ecoli_prom.fa')
+--non_prom_path  Path to non-promoter sequence dataset (default: 'non_promo_dataset/Ecoli_non_prom.fa')
+(These arguements are only for CNN model)
+```
 
 ## **Training & Evaluation**
 
 ### **Training the Model**
 To train the model, use:
 ```bash
-python main.py --train \
+# For CNN model
+python main.py --train --model CNN\
+    --num_epochs 10
     --prom_path promoter_dataset_path \
     --non_prom_path nonpromoter_dataset_path \
+
+python main.py --train --model transformer\
+    --num_epochs 10
 ```
 
-The trained model will be saved as **`saved_model.pth`** by default.
+The trained models will be saved as:
+- CNN: **`best_model.pth`**
+- Transformer: **`best_transformer_model.pth`**
 
 ---
 
 ### **Evaluating the Model**
 To evaluate a trained model, run:
 ```bash
-python main.py --eval \
-    --model_path saved_model.pth \
-    --test_prom promoter_dataset_path \
-    --test_non_prom nonpromoter_dataset_path
+# For CNN model
+python main.py --eval --model CNN
+
+# For Transformer model
+python main.py --eval --model transformer
 ```
 
-## **Example Workflow**
-### **Step 1: Train the Model**
-```bash
-python main.py --train \
-    --prom_path dataset/human_non_tata.fa \
-    --non_prom_path dataset/human_nonprom_big.fa \
-    --epochs 50 \
-    --batch_size 32 \
-    --lr 0.001
-```
+## **Model Details**
 
-### **Step 2: Save the Model**
-After training, the model is saved as `saved_model.pth`.
+### **CNN Architecture**
+- Input: One-hot encoded DNA sequences
+- Multiple convolutional layers
+- Max pooling and dropout
+- Dense layers for classification
 
-### **Step 3: Evaluate the Model**
-```bash
-python main.py --eval \
-    --model_path saved_model.pth \
-    --test_prom dataset/human_non_tata.fa \
-    --test_non_prom dataset/human_nonprom_big.fa
-```
+### **Transformer Architecture**
+- Based on DNA-BERT (117M parameters)
+- Specialized DNA sequence tokenization
+- Pre-trained on large DNA corpus
+- Fine-tuned classification head
+
+## **Performance Metrics**
+Both models are evaluated using:
+- Sensitivity (Sn)
+- Specificity (Sp)
+- Accuracy (Acc)
+- Matthews Correlation Coefficient (MCC)

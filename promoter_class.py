@@ -12,12 +12,12 @@ class PromoterDataset(Dataset):
         return self.X[idx], self.y[idx]
 
 class PromoterTransformerDataset(Dataset):
-    def __init__(self, tokens, labels):
-        self.tokens = tokens
+    def __init__(self, sequences, labels):
+        self.sequences = sequences
         self.labels = labels
 
     def __len__(self):
         return len(self.labels)
 
     def __getitem__(self, idx):
-        return {key: val[idx] for key, val in self.tokens.items()}, self.labels[idx]
+        return self.sequences[idx], self.labels[idx]

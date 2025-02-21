@@ -98,3 +98,32 @@ def create_train_test_data_transformer():
     )
     
     return train_sequences, test_sequences, train_labels, test_labels
+
+def main():
+    print("Testing data preprocessing functions...")
+    
+    # Test transformer data creation
+    print("\nTesting create_train_test_data_transformer:")
+    train_sequences, test_sequences, train_labels, test_labels = create_train_test_data_transformer()
+    
+    print(f"\nDataset Split Results:")
+    print(f"Train sequences: {len(train_sequences)}")
+    print(f"Test sequences: {len(test_sequences)}")
+    print(f"Train labels: {len(train_labels)}")
+    print(f"Test labels: {len(test_labels)}")
+    
+    # Print sample data
+    print(f"\nSample sequence from training set:")
+    print(train_sequences[0][:100] + "...") # Print first 100 chars
+    print(f"Sample label: {train_labels[0]}")
+    
+    # # Test regular data creation
+    # print("\nTesting create_train_test_data:")
+    # X_train, X_test, y_train, y_test, seq_length = create_train_test_data()
+    
+    # print(f"\nSequence length: {seq_length}")
+    # print(f"X_train shape: {X_train.shape}")
+    # print(f"X_test shape: {X_test.shape}")
+
+if __name__ == "__main__":
+    main()

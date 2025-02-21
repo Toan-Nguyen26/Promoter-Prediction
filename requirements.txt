@@ -2,3 +2,4 @@ Bio
 torch
 torchaudio
 transformers
+einops
